@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	//localFileConf := config.GetFileConfig()
+	//localFileConf := config.NewUserConfig()
 	//online := config.NewOnlineConf(localFileConf)
 	////common.DownloadFile(localFileConf, online)
 	//common.UnzipFile(localFileConf, online)

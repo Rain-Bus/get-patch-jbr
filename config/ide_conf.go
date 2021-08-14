@@ -17,6 +17,9 @@ type IdeInfo struct {
 
 type IdeInfos map[string]*IdeInfo
 
+//  scanIde
+//  @Description: Scan the JetBrains' IDE from ~/.config/JetBrains
+//  @receiver ideInfos
 func (ideInfos IdeInfos) scanIde() {
 	// Assembly and read JetBrains' IDE config dir
 	homeDir, _ := os.UserHomeDir()
@@ -28,7 +31,7 @@ func (ideInfos IdeInfos) scanIde() {
 	for _, dir := range dirs {
 		if dir.IsDir() && reg.MatchString(dir.Name()) {
 
-			// split dir name to ide name and ide version
+			// Split dir name to ide name and ide version
 			splitDirName := reg.FindStringSubmatch(dir.Name())
 			splitIdeName := splitDirName[1]
 			splitIdeVersion := splitDirName[2]
@@ -41,7 +44,7 @@ func (ideInfos IdeInfos) scanIde() {
 					splitIdeName = simpleIdeName
 				}
 
-				// Get the {ide}.jdk file, if it doesn't exist
+				// Get the {ide}.jdk file, if it doesn't exist, maybe use built-in Jdk
 				jetJdkConfPath := jetIdeConfPath + "/" + strings.ToLower(splitIdeName) + ".jdk"
 				fileReader, _ := os.Open(jetJdkConfPath)
 				jdkPath, err := ioutil.ReadAll(fileReader)
@@ -66,16 +69,29 @@ func (ideInfos IdeInfos) scanIde() {
 	}
 }
 
+//  simplifyIdeName
+//  @Description: Some IDEs name need to simplify
+//  @receiver ideInfos
+//  @param ideName: Complete name
+//  @return string: Simplified name
 func (ideInfos IdeInfos) simplifyIdeName(ideName string) string {
 	simplifyMap := map[string]string{"IntelliJIdea": "Idea"}
 	return simplifyMap[ideName]
 }
 
+//  restoreIdeName
+//  @Description: Restore the simplified name
+//  @receiver ideInfos
+//  @param simpleName: Simplified name
+//  @return string: Complete name
 func (ideInfos IdeInfos) restoreIdeName(simpleName string) string {
 	restoreMap := map[string]string{"Idea": "IntelliJIdea"}
 	return restoreMap[simpleName]
 }
 
+// GetIdeInfos
+//  @Description: The construct of IdeInfos
+//  @return *IdeInfos
 func GetIdeInfos() *IdeInfos {
 	ideInfos := IdeInfos{}
 	ideInfos.scanIde()

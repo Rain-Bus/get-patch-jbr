@@ -1,8 +1,10 @@
 package util
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/fatih/color"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -62,6 +64,9 @@ func GetYNConfirm(confirmMsg string, defaultVal string /*"y" or "n" or ""*/) boo
 
 }
 
+// ShowSerialTable
+//  @Description: Print the table
+//  @receiver serialTable: The table need to print
 func (serialTable *SerialTable) ShowSerialTable() {
 	serialTable.validateSerialTable()
 	tableWidth := len(serialTable.TableHeader)
@@ -82,15 +87,25 @@ func (serialTable *SerialTable) ShowSerialTable() {
 
 }
 
+//  printTableHeader
+//  @Description: Print table header
+//  @receiver serialTable
+//  @param formatter: Mainly used to present the length of every column
 func (serialTable *SerialTable) printTableHeader(formatter string) {
 	tableHeader := []string{""}
 	tableHeader = append(tableHeader, serialTable.TableHeader...)
 	_, _ = color.New(color.FgBlue, color.Bold).Printf(formatter, ConvertStrArr2Inter(tableHeader)...)
 }
 
+//  printTableBody
+//  @Description: Print table body
+//  @receiver serialTable
+//  @param formatter: Mainly used to present the length of every column
+//  @param tableHeight: Control the number of rows to print
 func (serialTable *SerialTable) printTableBody(formatter string, tableHeight int) {
 	var tableRow []string
 
+	// If containZero is true, the serial number will start with 0
 	for row := 0; row < tableHeight; row++ {
 		if serialTable.containZero {
 			tableRow = append(tableRow, strconv.Itoa(row))
@@ -101,13 +116,17 @@ func (serialTable *SerialTable) printTableBody(formatter string, tableHeight int
 			tableRow = append(tableRow, serialTable.Elements[header][row])
 		}
 		color.Cyan(formatter, ConvertStrArr2Inter(tableRow)...)
+		// After print, clear the row record
 		tableRow = tableRow[0:0]
 	}
 }
 
+//  validateSerialTable
+//  @Description: Validate the attribute of serial table
+//  @receiver serialTable: The need validate serial table
 func (serialTable *SerialTable) validateSerialTable() {
 	tableWidth := len(serialTable.TableHeader)
-	// Judge map contain all header
+	// Validate element map contain all header
 	var eleHeaders []string
 	for eleHeader, _ := range serialTable.Elements {
 		eleHeaders = append(eleHeaders, eleHeader)
@@ -123,6 +142,7 @@ func (serialTable *SerialTable) validateSerialTable() {
 		panic("The element width number is not fit to the number of table header")
 	}
 
+	// Validate the element map's data height is same
 	lastLen := -1
 	for header, elements := range serialTable.Elements {
 		if lastLen == -1 {
@@ -169,6 +189,17 @@ func (serialTable *SerialTable) GetNumConfirm(confirmMsg string) int {
 	return minRange
 }
 
+// NewSerialTable
+//  @Description: The construct of SerialTable
+//  @param containZero: The serial table start with zero or one
+//  @return *SerialTable: Generated new table
 func NewSerialTable(containZero bool) *SerialTable {
 	return &SerialTable{containZero: containZero}
+}
+
+// PressEnterContinue
+//  @Description: This is the pause print of command line
+func PressEnterContinue() {
+	color.Green("Press Enter to continue...")
+	_, _ = bufio.NewReader(os.Stdin).ReadBytes('\n')
 }

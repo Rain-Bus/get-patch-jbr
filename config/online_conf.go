@@ -14,6 +14,10 @@ type OnlineConf struct {
 	Filename string
 }
 
+//  getOnlineConf
+//  @Description: Request GitHub api to get the newest version
+//  @receiver onlineConf
+//  @param userConf
 func (onlineConf *OnlineConf) getOnlineConf(userConf *UserConf) {
 
 	apiUrl := GetApiUrl(userConf)
@@ -26,6 +30,7 @@ func (onlineConf *OnlineConf) getOnlineConf(userConf *UserConf) {
 
 	body, err := ioutil.ReadAll(resp.Body)
 	respStr := string(body)
+
 	// Get the newest Tag
 	reg, _ := regexp.Compile(`"tag_name":\s*"(\w+)"`)
 	onlineConf.Tag = reg.FindStringSubmatch(respStr)[1]
@@ -39,6 +44,10 @@ func (onlineConf *OnlineConf) getOnlineConf(userConf *UserConf) {
 	color.Green("The last version packaged at: %s", packageTimestamp.Format("2006-01-02 15:04"))
 }
 
+// NewOnlineConf
+//  @Description: The construct of OnlineConf
+//  @param userConf
+//  @return *OnlineConf
 func NewOnlineConf(userConf *UserConf) *OnlineConf {
 	onlineConf := new(OnlineConf)
 	onlineConf.getOnlineConf(userConf)
